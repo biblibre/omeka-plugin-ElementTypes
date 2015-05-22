@@ -1,0 +1,57 @@
+# Translation for the Element Types plugin for Omeka.
+# Copyright (C) 2015 BibLibre
+# This file is distributed under the same license as the Omeka package.
+# Julian Maurice <julian.maurice@biblibre.com>, 2015
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: ElementTypes\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-04-30 09:27+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: controllers/IndexController.php:42 controllers/IndexController.php:81
+msgid "Successfully saved configuration"
+msgstr ""
+
+#: views/admin/index/index.php:1 views/admin/index/edit-options.php:1
+#: views/admin/index/edit.php:1
+msgid "Element Types"
+msgstr ""
+
+#: views/admin/index/index.php:7
+msgid "Element"
+msgstr ""
+
+#: views/admin/index/index.php:9
+msgid "Actions"
+msgstr ""
+
+#: views/admin/index/index.php:26
+msgid "Modify"
+msgstr ""
+
+#: views/admin/index/edit-options.php:4
+#, php-format
+msgid "Configure type %1$s for element %2$s"
+msgstr ""
+
+#: views/admin/index/edit-options.php:11 views/admin/index/edit.php:22
+msgid "Save"
+msgstr ""
+
+#: views/admin/index/edit.php:4
+#, php-format
+msgid "Change type of element %s"
+msgstr ""
+
+#: ElementTypesPlugin.php:114
+msgid "Element types"
+msgstr ""
