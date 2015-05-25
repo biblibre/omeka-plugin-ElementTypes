@@ -14,10 +14,12 @@ class ElementTypesPlugin extends Omeka_Plugin_AbstractPlugin
         'install',
         'uninstall',
         'initialize',
+        'admin_head',
     );
 
     protected $_filters = array(
         'admin_navigation_main',
+        'element_types_info',
     );
 
     /**
@@ -105,6 +107,24 @@ class ElementTypesPlugin extends Omeka_Plugin_AbstractPlugin
         Zend_Registry::set('element_types_by_id', $element_types_by_id);
     }
 
+    public function hookAdminHead($args) {
+        $request = Zend_Controller_Front::getInstance()->getRequest();
+
+        $module = $request->getModuleName();
+        if (is_null($module)) {
+            $module = 'default';
+        }
+        $controller = $request->getControllerName();
+        $action = $request->getActionName();
+
+        if ($module === 'default'
+            && $controller === 'items'
+            && in_array($action, array('add', 'edit')))
+        {
+            queue_js_file('date');
+        }
+    }
+
     /**
      * Add an entry in the admin navigation menu.
      */
@@ -115,6 +135,19 @@ class ElementTypesPlugin extends Omeka_Plugin_AbstractPlugin
             'uri' => url('element-types'),
         );
         return $nav;
+    }
+
+    public function filterElementTypesInfo($types) {
+        $types['date'] = array(
+            'label' => __('Date'),
+            'filters' => array(
+                'ElementInput' => array($this, 'dateFilterElementInput'),
+            ),
+            'hooks' => array(
+                'OptionsForm' => array($this, 'dateHookOptionsForm'),
+            ),
+        );
+        return $types;
     }
 
     public function filterDisplay($text, $args) {
@@ -162,5 +195,34 @@ class ElementTypesPlugin extends Omeka_Plugin_AbstractPlugin
             $element_type['element_type_options'], TRUE);
 
         return call_user_func($filter, $value, $args);
+    }
+
+
+    // Date type callbacks //
+
+    public function dateFilterElementInput($components, $args)
+    {
+        $view = get_view();
+        $element = $args['element'];
+        $element_id = $element->id;
+        $index = $args['index'];
+        $name = "Elements[$element_id][$index][text]";
+        $components['input'] = $view->formText($name, $args['value'], array(
+            'data-type' => 'date',
+            'data-format' => $args['element_type_options']['format'],
+        ));
+        $components['html_checkbox'] = NULL;
+        return $components;
+    }
+
+    public function dateHookOptionsForm($args) {
+        $view = get_view();
+        $options = $args['element_type']['element_type_options'];
+        print $view->formLabel('format', __('Format')) . ' ';
+        print $view->formText(
+            'format',
+            isset($options) ? $options['format'] : ''
+        );
+        print ' <a href="http://api.jqueryui.com/datepicker/#utility-formatDate" target="_blank">' . __('See the list of all possible formats') . '</a>';
     }
 }
