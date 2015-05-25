@@ -34,7 +34,7 @@ class ElementTypesPlugin extends Omeka_Plugin_AbstractPlugin
                 element_type varchar(255) NOT NULL,
                 element_type_options TEXT NULL DEFAULT NULL,
                 PRIMARY KEY (id),
-                FOREIGN KEY (element_id) REFERENCES elements (id)
+                FOREIGN KEY (element_id) REFERENCES {$db->Element} (id)
                     ON DELETE CASCADE ON UPDATE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
         ";
