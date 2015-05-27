@@ -18,7 +18,7 @@
           <td>
             <?php
               if (isset($element_types_info[$element['element_type']])) {
-                echo $element_types_info[$element['element_type']]['label'];
+                echo __($element_types_info[$element['element_type']]['label']);
               }
             ?>
           </td>

@@ -126,7 +126,7 @@ class ElementTypes_IndexController extends Omeka_Controller_AbstractActionContro
         $element_types = $this->_getElementTypesInfo();
         $options = array('' => '');
         foreach ($element_types as $key => $type) {
-            $options[$key] = $type['label'];
+            $options[$key] = __($type['label']);
         }
         return $options;
     }
