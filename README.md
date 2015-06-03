@@ -6,8 +6,8 @@ Allow elements to have a type, thus allowing easier input. For instance, this pl
 
 * Install ElementTypes and Date plugins
 * A new link 'Element Types' appears on navigation menu, click on it.
-* Say you want to assign the type 'date' to the 'Date' element, click on "Modify" on the corresponding row, sel* "Date", then Save.
-* Optionally, you can configure the 'date' type for this particular element by clicking on 'Configure' link (for * you can only configure the date format)
+* Say you want to assign the type 'date' to the 'Date' element, click on "Modify" on the corresponding row, select "Date", then Save.
+* Optionally, you can configure the 'date' type for this particular element by clicking on 'Configure' link (for now you can only configure the date format)
 * Edit or create an item, and see you now have a datepicker for the Date element.
 
 ## New plugins for other needs
