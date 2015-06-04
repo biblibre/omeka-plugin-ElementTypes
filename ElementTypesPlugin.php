@@ -92,17 +92,16 @@ class ElementTypesPlugin extends Omeka_Plugin_AbstractPlugin
                 );
             }
 
-            $element_type_info = $element_types_info[$element_type->element_type];
-            if (isset($element_type_info['hooks'])) {
-                foreach ($element_type_info['hooks'] as $key => $hook) {
-                    add_plugin_hook(
-                        "element_types_{$element_type->element_type}_{$key}",
-                        $hook
-                    );
-                }
-            }
 
             $element_types_by_id[$element_type->element_id] = $element_type;
+        }
+
+        $element_type_info = $element_types_info[$element_type->element_type];
+        if (isset($element_type_info['hooks'])) {
+            foreach ($element_type_info['hooks'] as $key => $hook) {
+                $hook_name = "element_types_{$element_type->element_type}_{$key}";
+                add_plugin_hook($hook_name, $hook);
+            }
         }
         Zend_Registry::set('element_types_by_id', $element_types_by_id);
     }
