@@ -104,7 +104,8 @@ class ElementTypes_IndexController extends Omeka_Controller_AbstractActionContro
                 LEFT JOIN {$db->ItemTypesElements} ite ON e.id = ite.element_id
                 LEFT JOIN {$db->ItemType} it ON ite.item_type_id = it.id
                 LEFT JOIN {$db->ElementType} et ON e.id = et.element_id
-            WHERE es.record_type IS NULL OR es.record_type = 'Item'
+            WHERE es.record_type IS NULL
+              OR (es.record_type = 'Item' AND it.name IS NOT NULL)
             ORDER BY es.name, it.name, e.name
         ";
         $elements = $db->fetchAll($sql);
