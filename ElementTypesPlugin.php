@@ -121,7 +121,47 @@ class ElementTypesPlugin extends Omeka_Plugin_AbstractPlugin
             && $controller === 'items'
             && in_array($action, array('add', 'edit')))
         {
+
+						$locale="en"; // Sanity state
+
+						$configIni=parse_ini_file(APP_DIR . '/config/config.ini');
+
+						if (isset($configIni["locale.name"])) {
+							$locale=$configIni["locale.name"];
+							$underscore=strpos($locale, "_");
+							$locale = ($underscore ? substr($locale,0,$underscore) : $locale);
+						}
+
+            queue_js_file('jquery.plugin.min');
+            queue_js_file('jquery.mousewheel.min');
+
+            queue_js_file('jquery.calendars.all.min');
+            queue_js_file('jquery.calendars.julian.min');
+            queue_js_file('jquery.calendars.picker.min');
+
+            if ($locale!="en") {
+							queue_js_file('jquery.calendars-'.$locale);
+            	queue_js_file('jquery.calendars.picker-'.$locale);
+						}
+
+            queue_css_file('jquery.calendars.picker');
             queue_js_file('date');
+
+						$timespan=__("Time Span");
+						$gregorian=__("Gregorian");
+						$julian=__("Julian");
+						$convert=__("Convert");
+						echo <<<EOT
+<script type='text/javascript'>
+var elTypesTimeSpan="$timespan";
+var elTypesConvert="$convert";
+var elTypesGregorian="$gregorian";
+var elTypesJulian="$julian";
+var elTypesLocale="$locale";
+</script>
+
+EOT;
+
         }
     }
 
@@ -227,6 +267,6 @@ class ElementTypesPlugin extends Omeka_Plugin_AbstractPlugin
             'format',
             isset($options) ? $options['format'] : ''
         );
-        print ' <a href="http://api.jqueryui.com/datepicker/#utility-formatDate" target="_blank">' . __('See the list of all possible formats') . '</a>';
+        print ' <a href="http://keith-wood.name/calendarsPicker.html#format" target="_blank">' . __('See the list of all possible formats') . '</a>';
     }
 }
