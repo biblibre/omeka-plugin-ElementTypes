@@ -56,6 +56,22 @@ msgstr ""
 msgid "Element types"
 msgstr ""
 
-#: ElementTypesPlugin.php:226
+#: ElementTypesPlugin.php:150
+msgid "Time Span"
+msgstr ""
+
+#: ElementTypesPlugin.php:151
+msgid "Convert"
+msgstr ""
+
+#: ElementTypesPlugin.php:152
+msgid "Gregorian"
+msgstr ""
+
+#: ElementTypesPlugin.php:153
+msgid "Julian"
+msgstr ""
+
+#: ElementTypesPlugin.php:270
 msgid "See the list of all possible formats"
 msgstr ""
