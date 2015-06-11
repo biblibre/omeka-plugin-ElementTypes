@@ -13,6 +13,7 @@ class ElementTypesPlugin extends Omeka_Plugin_AbstractPlugin
     protected $_hooks = array(
         'install',
         'uninstall',
+        'upgrade',
         'initialize',
         'admin_head',
     );
@@ -54,6 +55,35 @@ class ElementTypesPlugin extends Omeka_Plugin_AbstractPlugin
         $db->query($sql);
     }
 
+    public function hookUpgrade($args)
+    {
+        $old_version = $args['old_version'];
+        $db = $this->_db;
+
+        if (version_compare($old_version, '0.3', '<=')) {
+            $table = $db->getTable('ElementText');
+            $select = $table->getSelect()
+                ->join(array('et' => "{$db->ElementType}"),
+                    'element_texts.element_id = et.element_id')
+                ->where('et.element_type = ?', 'date');
+            $elementTexts = $table->fetchObjects($select);
+            foreach ($elementTexts as $elementText) {
+                $text = $this->dateFilterFormat($elementText->text, array());
+                if (isset($text)) {
+                    $elementText->text = $text;
+                    $elementText->save();
+                }
+            }
+
+            $table = $db->getTable('ElementType');
+            $elementTypes = $table->findByElementType('date');
+            foreach ($elementTypes as $elementType) {
+                $elementType->element_type_options = json_encode(array('format' => ''));
+                $elementType->save();
+            }
+        }
+    }
+
     /**
      * Set up plugins, translations, and filters
      */
@@ -73,7 +103,8 @@ class ElementTypesPlugin extends Omeka_Plugin_AbstractPlugin
             'ElementInput',
             'Flatten',
             'Save',
-            'Validate'
+            'Validate',
+            'Format',
         );
         $element_types = $db->getTable('ElementType')->findAll();
         $element_types_by_id = array();
@@ -142,6 +173,8 @@ class ElementTypesPlugin extends Omeka_Plugin_AbstractPlugin
             'label' => __('Date'),
             'filters' => array(
                 'ElementInput' => array($this, 'dateFilterElementInput'),
+                'Display' => array($this, 'dateFilterDisplay'),
+                'Format' => array($this, 'dateFilterFormat'),
             ),
             'hooks' => array(
                 'OptionsForm' => array($this, 'dateHookOptionsForm'),
@@ -184,6 +217,11 @@ class ElementTypesPlugin extends Omeka_Plugin_AbstractPlugin
         return $this->_applyFilters('Validate', $element_id, $isValid, $args);
     }
 
+    public function filterFormat($value, $args) {
+        $element_id = $args['element']->id;
+        return $this->_applyFilters('Format', $element_id, $value, $args);
+    }
+
     protected function _applyFilters($name, $element_id, $value, $args) {
         $element_types_info = Zend_Registry::get('element_types_info');
         $element_types_by_id = Zend_Registry::get('element_types_by_id');
@@ -213,10 +251,23 @@ class ElementTypesPlugin extends Omeka_Plugin_AbstractPlugin
         $name = "Elements[$element_id][$index][text]";
         $components['input'] = $view->formText($name, $args['value'], array(
             'data-type' => 'date',
-            'data-format' => $args['element_type_options']['format'],
         ));
         $components['html_checkbox'] = NULL;
         return $components;
+    }
+
+    public function dateFilterDisplay($text, $args)
+    {
+        $format = $args['element_type_options']['format'];
+        $format = $format ? $format : '%F';
+        $time = strtotime($text);
+        return $time ? strftime($format, $time) : '';
+    }
+
+    public function dateFilterFormat($value, $args)
+    {
+        $time = strtotime($value);
+        return $time ? strftime('%F', $time) : null;
     }
 
     public function dateHookOptionsForm($args) {
@@ -227,6 +278,15 @@ class ElementTypesPlugin extends Omeka_Plugin_AbstractPlugin
             'format',
             isset($options) ? $options['format'] : ''
         );
-        print ' <a href="http://api.jqueryui.com/datepicker/#utility-formatDate" target="_blank">' . __('See the list of all possible formats') . '</a>';
+        print ' <a href="http://php.net/manual/fr/function.strftime.php" target="_blank">' . __('See the list of all possible formats') . '</a>';
     }
+}
+
+function element_types_format($element_id, $value)
+{
+    $db = get_db();
+    $element = $db->getTable('Element')->find($element_id);
+    $elementSet = $db->getTable('ElementSet')->find($element->element_set_id);
+    $filter = array('Format', 'Item', $elementSet->name, $element->name);
+    return apply_filters($filter, $value, array('element' => $element));
 }
