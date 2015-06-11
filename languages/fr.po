@@ -52,6 +52,10 @@ msgstr "Enregistrer"
 msgid "Change type of element %s"
 msgstr "Changer le type de l'élément %s"
 
-#: ElementTypesPlugin.php:114
+#: ElementTypesPlugin.php:165
 msgid "Element types"
 msgstr "Types d'élément"
+
+#: ElementTypesPlugin.php:281
+msgid "See the list of all possible formats"
+msgstr "Voir la liste de tous les formats possibles"

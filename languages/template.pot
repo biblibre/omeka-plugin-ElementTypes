@@ -52,10 +52,10 @@ msgstr ""
 msgid "Change type of element %s"
 msgstr ""
 
-#: ElementTypesPlugin.php:114
+#: ElementTypesPlugin.php:165
 msgid "Element types"
 msgstr ""
 
-#: ElementTypesPlugin.php:226
+#: ElementTypesPlugin.php:281
 msgid "See the list of all possible formats"
 msgstr ""
