@@ -173,6 +173,8 @@ class ElementTypesPlugin extends Omeka_Plugin_AbstractPlugin
             'label' => __('Date'),
             'filters' => array(
                 'ElementInput' => array($this, 'dateFilterElementInput'),
+                'Save' => array($this, 'dateFilterSave'),
+                'Validate' => array($this, 'dateFilterValidate'),
                 'Display' => array($this, 'dateFilterDisplay'),
                 'Format' => array($this, 'dateFilterFormat'),
             ),
@@ -249,25 +251,64 @@ class ElementTypesPlugin extends Omeka_Plugin_AbstractPlugin
         $element_id = $element->id;
         $index = $args['index'];
         $name = "Elements[$element_id][$index][text]";
+        $format = $args['element_type_options']['format'];
         $components['input'] = $view->formText($name, $args['value'], array(
             'data-type' => 'date',
+            'data-format' => $this->_phpToDatepickerFormat($format),
         ));
         $components['html_checkbox'] = NULL;
         return $components;
     }
 
+    public function dateFilterSave($text, $args)
+    {
+        $format = $args['element_type_options']['format'];
+        $format = $format ? $format : 'Y-m-d';
+
+        $dt = DateTime::createFromFormat($format, $text);
+        if ($dt) {
+            return $dt->format('Y-m-d');
+        }
+
+        return $text;
+    }
+
+    public function dateFilterValidate($isValid, $args)
+    {
+        $dt = DateTime::createFromFormat('Y-m-d', $args['text']);
+
+        return $dt ? true : false;
+    }
+
     public function dateFilterDisplay($text, $args)
     {
         $format = $args['element_type_options']['format'];
-        $format = $format ? $format : '%F';
-        $time = strtotime($text);
-        return $time ? strftime($format, $time) : '';
+        $format = $format ? $format : 'Y-m-d';
+
+        $dt = DateTime::createFromFormat('Y-m-d', $text);
+        if ($dt) {
+            return $dt->format($format);
+        }
+
+        return '';
     }
 
     public function dateFilterFormat($value, $args)
     {
+        $format = $args['element_type_options']['format'];
+        $format = $format ? $format : 'Y-m-d';
+
+        $dt = DateTime::createFromFormat($format, $value);
+        if ($dt) {
+            return $dt->format('Y-m-d');
+        }
+
         $time = strtotime($value);
-        return $time ? strftime('%F', $time) : null;
+        if ($time) {
+            return date('Y-m-d', $time);
+        }
+
+        return null;
     }
 
     public function dateHookOptionsForm($args) {
@@ -278,7 +319,58 @@ class ElementTypesPlugin extends Omeka_Plugin_AbstractPlugin
             'format',
             isset($options) ? $options['format'] : ''
         );
-        print ' <a href="http://php.net/manual/fr/function.strftime.php" target="_blank">' . __('See the list of all possible formats') . '</a>';
+        print ' <span>(' . __('Example:') . ' Y-m-d)</span>';
+        print
+            '<h2>' . __('Possible formats') . '</h2>'
+            . '<table>'
+            . '  <tbody>'
+            . '    <tr><td>j</td><td>' . __('Day of month') . '</td></tr>'
+            . '    <tr><td>d</td><td>' . __('Day of month (with padding zero)') . '</td></tr>'
+            . '    <tr><td>z</td><td>' . __('Day of year') . '</td></tr>'
+            . '    <tr><td>D</td><td>' . __('Day name (short)') . '</td></tr>'
+            . '    <tr><td>l</td><td>' . __('Day name (long)') . '</td></tr>'
+            . '    <tr><td>n</td><td>' . __('Month of year') . '</td></tr>'
+            . '    <tr><td>m</td><td>' . __('Month of year (with padding zero)') . '</td></tr>'
+            . '    <tr><td>M</td><td>' . __('Month name (short)') . '</td></tr>'
+            . '    <tr><td>F</td><td>' . __('Month name (long)') . '</td></tr>'
+            . '    <tr><td>y</td><td>' . __('Year (2 digits)') . '</td></tr>'
+            . '    <tr><td>Y</td><td>' . __('Year (4 digits)') . '</td></tr>'
+            . '  </tbody>'
+            . '</table>';
+    }
+
+    protected function _phpToDatepickerFormat($format)
+    {
+        $chars = str_split($format);
+        $escaped = false;
+        $dpFormat = '';
+        foreach ($chars as $c) {
+            if ($escaped) {
+                $dpFormat .= $c == "'" ? "''" : "'$c'";
+                $escaped = false;
+                continue;
+            }
+
+            switch ($c) {
+                case 'j': $dpFormat .= 'd';  break;  // day of month
+                case 'd': $dpFormat .= 'dd'; break;  // day of month with 0
+                case 'z': $dpFormat .= 'o';  break;  // day of year
+                case 'D': $dpFormat .= 'D';  break;  // day name short
+                case 'l': $dpFormat .= 'DD'; break;  // day name long
+                case 'n': $dpFormat .= 'm';  break;  // month of year
+                case 'm': $dpFormat .= 'mm'; break;  // month of year with 0
+                case 'M': $dpFormat .= 'M';  break;  // month name short
+                case 'F': $dpFormat .= 'MM'; break;  // month name long
+                case 'y': $dpFormat .= 'y';  break;  // year (2 digits)
+                case 'Y': $dpFormat .= 'yy'; break;  // year (4 digits)
+
+                case "'": $dpFormat .= "''"; break;  // single quote
+                case "\\": $escaped = true;  break;
+
+                default: $dpFormat .= "'$c'";
+            }
+        }
+        return $dpFormat;
     }
 }
 
