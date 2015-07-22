@@ -242,7 +242,8 @@ class ElementTypesPlugin extends Omeka_Plugin_AbstractPlugin
         $index = $args['index'];
         $name = "Elements[$element_id][$index][text]";
         $format = $args['element_type_options']['format'];
-        $components['input'] = $view->formText($name, $args['value'], array(
+        $value = $this->dateFilterDisplay($args['value'], $args);
+        $components['input'] = $view->formText($name, $value, array(
             'data-type' => 'date',
             'data-format' => $this->_phpToDatepickerFormat($format),
         ));
