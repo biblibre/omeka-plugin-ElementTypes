@@ -121,6 +121,10 @@ class ElementTypesPlugin extends Omeka_Plugin_AbstractPlugin
                     array($filter_name, 'Item', $elementSet->name, $element->name),
                     array($this, 'filter' . $filter_name)
                 );
+                add_filter(
+                    array($filter_name, 'Collection', $elementSet->name, $element->name),
+                    array($this, 'filter' . $filter_name)
+                );
             }
 
 
@@ -139,21 +143,7 @@ class ElementTypesPlugin extends Omeka_Plugin_AbstractPlugin
     }
 
     public function hookAdminHead($args) {
-        $request = Zend_Controller_Front::getInstance()->getRequest();
-
-        $module = $request->getModuleName();
-        if (is_null($module)) {
-            $module = 'default';
-        }
-        $controller = $request->getControllerName();
-        $action = $request->getActionName();
-
-        if ($module === 'default'
-            && $controller === 'items'
-            && in_array($action, array('add', 'edit')))
-        {
-            queue_js_file('date');
-        }
+        queue_js_file('date');
     }
 
     /**
